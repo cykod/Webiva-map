@@ -1,0 +1,122 @@
+var MapEngine = {
+  options: {},
+  map: null,
+
+  initialize: function(opts) {
+    MapEngine.options = opts;
+  
+  },
+  
+  icons: {},
+  
+  lastLocation: function() {
+    var val = readCookie('MapLocation');
+    if(val) {
+      val = val.split(":");
+      return new GLatLng(val[0],val[1]);
+    }
+    else {
+          
+      return new GLatLng(MapEngine.options.lon,MapEngine.options.lat);
+    }
+  },
+
+  lastZoom: function() {
+    var val = readCookie('zoomLevel');
+    return Number(val ? val : 15);
+      
+
+  },
+
+  pageLoad: function() {
+     if (GBrowserIsCompatible()) {
+        MapEngine.map = new GMap2(document.getElementById(MapEngine.options.element_name));
+        MapEngine.map.setCenter(new GLatLng(MapEngine.options.lat,MapEngine.options.lon), MapEngine.options.zoom);
+        
+        if(MapEngine.options.map_zoom == 'full')
+          MapEngine.map.addControl(new GLargeMapControl());
+        if(MapEngine.options.map_zoom == 'small')
+          MapEngine.map.addControl(new GSmallMapControl());
+        if(MapEngine.options.map_types == 'yes')
+          MapEngine.map.addControl(new GMapTypeControl());
+        if(MapEngine.data)
+          MapEngine.refreshMap();
+          
+        if(MapEngine.options.bounds)
+          MapEngine.setMapBounds(MapEngine.options.bounds); 
+     }
+  },
+  
+  refreshMap: function() {
+    MapEngine.map.clearOverlays();
+    MapEngine.markers = {}
+    for(var i=0;i<MapEngine.data.length-1;i++) {
+      var idx = i;
+      var item = MapEngine.data[i]
+      if(item[0]) {
+        marker = new GMarker(new GLatLng(item[0],item[1]), { title: item[2] });
+        marker.idx = [ i ];
+        GEvent.addListener(marker,'click',MapEngine.clickMarker);
+        MapEngine.map.addOverlay(marker);
+      }
+        item[4] = marker;
+    }
+    if(MapEngine.options['click'] && MapEngine.data.length > 0) {
+      setTimeout(function() { MapEngine.clickMarker.apply(MapEngine.data[0][4]) }, 10);
+    }
+  },
+  
+  setMapBounds: function(bounds) {
+  
+    var gbounds = new GLatLngBounds(new GLatLng( bounds.lat_min,bounds.lon_min),new  GLatLng(bounds.lat_max,bounds.lon_max));
+    MapEngine.map.setCenter(gbounds.getCenter(),MapEngine.map.getBoundsZoomLevel(gbounds));
+  
+  },  
+  
+  clickMarker: function() {
+    MapEngine.selectedMarker = this;
+    MapEngine.selectMarker(this);
+  },
+  
+  selectMarker: function(marker,params) {
+    var markerData = MapEngine.data[marker.idx[0]];
+    
+    if(!params) {
+      params = { identifier: markerData[3] };
+    }
+    else {
+      params['identifier'] = markerData[3];
+    }
+    
+    new Ajax.Request(MapEngine.options.callbackUrl,
+                    { parameters: params,
+                      onComplete: function(req) {
+                        marker.openInfoWindowHtml(req.responseText);                  
+                    }});
+    
+  },
+  
+  updateInfoWindow: function(params) {
+    var iw = MapEngine.map.getInfoWindow();
+    var marker = MapEngine.selectedMarker;
+
+    
+    var content = iw.getContentContainers();
+    var markerData = MapEngine.data[marker.idx[0]];
+    
+    if(!params) {
+      params = { identifier: markerData[3] };
+    }
+    else {
+      params['identifier'] = markerData[3];
+    }
+    
+    new Ajax.Request(MapEngine.options.callbackUrl,
+                    { parameters: params,
+                      onComplete: function(req) {
+                        MapEngine.map.updateInfoWindow([new GInfoWindowTab(" ",req.responseText)]);
+                    }});
+  }
+};
+
+Event.observe(window, 'load', function() { MapEngine.pageLoad(); });

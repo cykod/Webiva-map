@@ -1,0 +1,16 @@
+<div class='cms_form'>
+ <% paragraph_options_form_for "Map Options",:map_view ,@options do |f| -%>
+    <%= f.text_field :width %>
+    <%= f.text_field :height  %>
+    <%= f.radio_buttons :display_type, [['Use Page Connection','connection'],['Show Locations','locations'],['Use Content Model Zip Codes','content_model']], :separator => '<br/>', :label => 'Display' %>
+    <%= f.radio_buttons :show_map_types, [ ['Yes','yes'],['No','no']] %>
+    <%= f.radio_buttons :show_zoom, [ ['Full Controls','full'],['Small Controllers','small'],['No Controllers','off']], :separator => '<br/>' %>
+    <%= f.text_field :default_zoom, :description => 'Initial zoom level (1-17)' %>
+    <%= f.select :content_model_id, @content_models %>
+    <%= f.select :content_model_field_id, @fields if @fields %>
+    <%= f.select :content_model_response_field_id, @text_fields if @text_fields %>
+
+    <%= f.filemanager_image :default_icon %>
+<% end -%>
+</div>
+

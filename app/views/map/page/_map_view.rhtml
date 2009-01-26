@@ -1,0 +1,43 @@
+<script>
+<% if !in_editor %>
+  <%= render :partial => '/map/page/map_js' %>
+  
+  MapEngine.initialize({ 
+                         element_name: 'map_view_<%= paragraph.id %>',
+                         <% if data[:bounds] %>
+                         <%= "bounds: { lat_min: #{data[:bounds][:lat_min]}, lat_max: #{data[:bounds][:lat_max]}, lon_min: #{data[:bounds][:lon_min]}, lon_max: #{data[:bounds][:lon_max]} }," %>
+                         <% end -%>
+                         <% if data[:center] -%>
+                         <%= "lat: #{data[:center][0]}, lon: #{data[:center][1]}," %>
+                         <% else -%>
+                           lat:  42.361429642754416,
+                           lon: -71.0610294342041,
+                         <% end -%>
+                         <% if !options.default_zoom.blank? -%>
+                           <%= "zoom: #{options.default_zoom},"%>
+                         <% else data[:zoom] -%>
+                           <%= "zoom: #{data[:zoom] ? data[:zoom] : 17},"%>
+                         <% end -%>
+                         <%= "click: true," if data[:click] %>
+                         <% if data[:callback] %>
+                         <%= "callbackUrl: '#{url_for(data[:callback])}'," %>
+                         <% end -%>
+                         map_types: "<%= options.show_map_types %>",
+                         map_zoom: "<%= options.show_zoom %>",
+                         empty: null
+                        });
+                
+  <% if data[:markers] && data[:markers].length > 0 -%> 
+  MapEngine.data = [
+<% data[:markers].each do |marker| -%>
+[ <%= marker[:lat] %>,<%= marker[:lon] %>,
+<%= marker[:title] ? "'#{jh(marker[:title])}'" : "null" %>,
+<%= marker[:ident]  ? "'#{jh(marker[:ident])}'" : "null" %> ],
+<% end -%>
+[]
+    ];
+  <% end -%>
+<% end -%>                 
+</script>
+<%= feature_output -%>
+

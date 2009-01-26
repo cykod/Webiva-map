@@ -1,0 +1,15 @@
+<script>
+<%= active_table_javascript %>
+</script>
+
+<% action_panel do |p| %>
+ <%= p.link 'Add a new location',:icon => 'add.gif',:action => 'edit' %>
+
+<% end -%>
+
+<hr/>
+<div class='admin_content'>
+<div id='location_table'>
+  <%= render :partial => 'location_table' %>
+</div>
+</div>

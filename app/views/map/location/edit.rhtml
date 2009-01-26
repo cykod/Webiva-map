@@ -1,0 +1,96 @@
+<script>
+LocationEditor = {
+   attachFile: function(field,type,id,path,url,thumb,name) {
+    this.removeAttachment(id);
+    
+    var code = "<table><tr><td>";
+    
+    if(type != 'img') {
+      code +=  "<img id='handle_item_" + id + "' src='" + thumb + "' align='top' width='64' height='64'>";
+    }
+    else {
+      code +=  "<div class='fm_image'><img src='" + thumb + "'  align='middle'></div>";
+    }
+    
+    code += " </td><td><a href='javascript:void(0);' onclick='LocationEditor.showAttachmentPopup(" + id + ");'>" + name + "</a></td></tr></table></div>";
+    
+    
+    // Need to create an element, otherwise
+    // $('location_images').innerHTML += ...  will kill the values
+    // in the input captions
+    var elem = document.createElement('div');
+    elem.id = 'attachment_' + id;
+    elem.className="attachment";
+    elem.innerHTML = code;
+    
+    $('location_images').appendChild(elem);
+     
+    LocationEditor.createMediaSortables();
+  },
+  
+  
+  createMediaSortables: function() {
+    Sortable.create('location_images',{ tag: 'div' });
+  
+  },
+  
+  submitForm: function() {
+  
+  
+    var images = $('location_images').select(".attachment").collect(function(elem) {
+      var name = elem.id.split("_");
+      return name[name.length - 1];
+    
+    });
+    $('location_image_list').value = images.join(",");
+     
+  },
+  
+  showAttachmentPopup: function(aid) {
+     SCMS.popup(new Array(
+        [ 'Remove Attachment', 'js', 'LocationEditor.removeAttachment(' + aid + ')' ]
+      )); 
+  },
+  
+  removeAttachment: function(id) {
+    if($('attachment_' + id)) {
+      Element.remove('attachment_' + id);
+      LocationEditor.createMediaSortables();
+    }
+  }
+  
+  
+  
+
+}
+</script>
+
+
+<div class='admin_content'>
+
+<% cms_form_for :location, @location, :html => { :class => 'admin_form', :onsubmit => 'LocationEditor.submitForm();' } do |f| -%>
+  <%= f.text_field :name %>
+  <%= f.filemanager_image :image_id %>
+  <%= f.text_field :identifier, :description => 'Leave identifier blank to create automatically' %>
+  <%= f.radio_buttons :active, [['Yes',true],['No',false]], :default => true %>
+  <%= f.text_field :address %>
+  <%= f.text_field :city %>
+  <%= f.text_field :state, :size => 5 %>
+  <%= f.text_field :zip, :size => 10 %>
+  <%= f.text_field :lat, :label => 'Latitude' %>
+  <%= f.text_field :lon, :label => 'Longitude' %>
+  <%= f.text_field :phone %>
+  <%= f.text_field :fax %>
+  <%= f.text_field :website %>
+  <%= f.text_area :description, :cols => 100, :rows => 15 %>
+  <% f.custom_field 'Image' do -%>
+                  <div>
+                <%= link_to '+Add Additional Images'.t, { :controller => '/file', :action => 'popup' , :select => 'file', :callback => 'LocationEditor.attachFile', :thumb_size => 'thumb' }, :popup => ['file_manager', 'height=400,width=600,resizable=yes,scrollbars=yes' ] %>
+                  <%= render :partial => 'files', :locals => { :files =>  @location.images, :field => "images" } %>
+                </div>
+           <script>LocationEditor.createMediaSortables();</script>
+   <% end -%>
+  <%= f.submit_tag @location.id ? 'Edit' : 'Create' %>
+<% end -%>
+
+</div>
