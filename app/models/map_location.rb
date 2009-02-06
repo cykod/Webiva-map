@@ -62,7 +62,7 @@ class MapLocation < DomainModel
 	        self.lat = calc_lat if self.lat.blank?
 	        self.lon = calc_lng if self.lon.blank?
 	        
-	        self.zip = place.elements['//PostalCodeNumber'].text if self.zip.blank?
+	        self.zip = place.elements['//PostalCodeNumber'].text if self.zip.blank? && place.elements['//PostalCodeNumber']
 	        
 	        return true
 	      end # end each place
