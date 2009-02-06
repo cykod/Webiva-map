@@ -15,6 +15,12 @@ class MapLocation < DomainModel
     }.find_all { |elm| !elm.blank? }
   end
   
+  def before_validation
+    if self.name.blank?
+      self.name = "#{self.address}, #{self.city} #{self.state}"
+    end
+  end
+  
   def before_save
    if identifier.blank?
       identifier_try_partial = name.downcase.gsub(/[ _]+/,"-").gsub(/[^a-z+0-9\-]/,"")
@@ -64,5 +70,9 @@ class MapLocation < DomainModel
     end # end if result == 200
     return false
   end  
+  
+  def self.existing_location(opts)
+    self.find(:first,:conditions => opts.slice(:address,:city,:state,:zip))
+  end
 
 end

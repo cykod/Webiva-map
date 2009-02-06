@@ -31,22 +31,30 @@ class Map::PageRenderer < ParagraphRenderer
     options = Map::PageController::MapViewOptions.new(paragraph.data || {})
   
     connection_type,connection_data = page_connection
+
     if options.display_type == 'connection'
+
       if !connection_data
         render_paragraph :nothing => true
         return
       end
-      obj = connection_data[0].find_by_id(connection_data[1])
-      
-      if !obj
-        render_paragraph :nothing => true
-        return
-      end
-      data = obj.map_data
-      
-      if !data[:markers] || data[:markers].length == 0
-        render_paragraph :nothing => true
-        return
+      if connection_type == :map_data
+        obj = connection_data[0].find_by_id(connection_data[1])
+        
+        if !obj
+          render_paragraph :nothing => true
+          return
+        end
+        data = obj.map_data
+        
+        if !data[:markers] || data[:markers].length == 0
+          render_paragraph :nothing => true
+          return
+        end
+      else connection_type == :callback
+        callback,data_func = connection_data
+        data = data_func.call
+        data[:callback] = callback
       end
     elsif options.display_type == 'content_model'
       data = get_content_model_data(paragraph.id,options.content_model_id,options.content_model_field_id,options.content_model_response_field_id)

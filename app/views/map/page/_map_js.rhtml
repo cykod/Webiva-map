@@ -88,7 +88,7 @@ var MapEngine = {
       params['identifier'] = markerData[3];
     }
     
-    new Ajax.Request(MapEngine.options.callbackUrl,
+    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3],
                     { parameters: params,
                       onComplete: function(req) {
                         marker.openInfoWindowHtml(req.responseText);                  
@@ -111,7 +111,7 @@ var MapEngine = {
       params['identifier'] = markerData[3];
     }
     
-    new Ajax.Request(MapEngine.options.callbackUrl,
+    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3],
                     { parameters: params,
                       onComplete: function(req) {
                         MapEngine.map.updateInfoWindow([new GInfoWindowTab(" ",req.responseText)]);
