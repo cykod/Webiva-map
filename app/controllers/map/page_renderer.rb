@@ -3,23 +3,9 @@ class Map::PageRenderer < ParagraphRenderer
   module_renderer
   
   paragraph :map_view
+  paragraph :location_detail
   
-  feature :map_display, :default_feature => <<-FEATURE
-    <div align='center'>
-      <cms:map/>
-    </div>
-  FEATURE
-  
-  
-  def map_display_feature(feature,data) 
-     parser_context = FeatureContext.new do |c|
-       c.define_value_tag('map') do |tag| 
-          "<div id='map_view_#{data[:paragraph].id}' style='width:#{data[:options].width}px; height:#{data[:options].height}px; overflow:hidden;'></div>"
-       end
-     end
-    parse_feature(feature,parser_context)
-  end
-  
+  features 'map/page_feature'
   
   def map_view
   
@@ -28,10 +14,10 @@ class Map::PageRenderer < ParagraphRenderer
      return
     end
     module_options = Map::Utility.options
-    options = Map::PageController::MapViewOptions.new(paragraph.data || {})
+    options = paragraph_options(:map_view)
   
     connection_type,connection_data = page_connection
-
+    
     if options.display_type == 'connection'
 
       if !connection_data
@@ -59,17 +45,53 @@ class Map::PageRenderer < ParagraphRenderer
     elsif options.display_type == 'content_model'
       data = get_content_model_data(paragraph.id,options.content_model_id,options.content_model_field_id,options.content_model_response_field_id)
     else
-      render_paragraph :text => 'Unsupported'
-      return
+      @search = SearchForm.new(params[:search])
+      if request.post? && params[:search] && @search.valid?
+        @searching = true
+        @locations = MapLocation.zip_search(@search.zip,@search.within)
+        @pages = {}
+      else
+        @pages,@locations = MapLocation.paginate(params[:page],:conditions => { :active => true },:order => 'name',:per_page => 20)
+      end
+      
+      data = MapLocation.location_data(@locations)
     end
   
     
     require_js('prototype')
     header_html("<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")
     
-    feature_data = { :paragraph => paragraph, :options =>  options }
-    feature_output = map_display_feature(get_feature('map_display'), feature_data)
-    render_paragraph :partial => '/map/page/map_view', :locals => {:paragraph => paragraph, :options =>  options, :in_editor => editor?, :data => data, :feature_output => feature_output }
+    dist_options = [ ['Within 500 Miles',500], ['Within 100 Miles',100],['Within 50 Miles',50], ['Within 10 Miles',10] ] 
+    feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :locations => @locations, :searching => @searching, :pages => @pages }
+
+    feature_output = map_display_feature(feature_data)
+    render_paragraph :partial => '/map/page/map_view', :locals => {
+          :paragraph => paragraph, 
+          :options =>  options, 
+          :in_editor => editor?, 
+          :data => data, 
+          :feature_output => feature_output,
+          :detail_url => options.detail_page_url.to_s }
+  end
+  
+  class SearchForm < HashModel
+    attributes :within => 100, :zip => ''
+    
+    integer_options :within
+  end
+  
+  
+  def location_detail
+  
+    conn_type,conn_id = page_connection
+    if conn_type == :location_id
+      @loc = MapLocation.find_by_id_and_active(conn_id,true)
+    elsif conn_type == :location_identifier
+      @loc = MapLocation.find_by_identifier_and_active(conn_id,true)
+    end
+  
+    data = { :location => @loc}
+    render_paragraph :text => map_page_location_detail_feature(data)
   end
   
   protected

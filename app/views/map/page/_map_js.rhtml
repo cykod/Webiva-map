@@ -5,8 +5,38 @@ var MapEngine = {
   initialize: function(opts) {
     MapEngine.options = opts;
   
+    if(opts.icon) {
+    	MapEngine.icon = new GIcon();
+	    MapEngine.icon.image = opts.icon.url;
+	    MapEngine.icon.iconSize = new GSize(opts.icon.width,opts.icon.height);
+	    MapEngine.icon.iconAnchor = new GPoint(opts.icon.icon_anchor_x,opts.icon.icon_anchor_y);
+	    MapEngine.icon.infoWindowAnchor = new GPoint(opts.icon.info_anchor_x,opts.icon.info_anchor_y);
+	    if(opts.icon.shadow_url) {
+	      MapEngine.icon.shadow = opts.icon.shadow_url;
+	      MapEngine.icon.shadowSize = new GSize(opts.icon.shadow_width,opts.icon.shadow_height);
+	     }
+	   }
+	
   },
   
+  createIcon: function(opts) {
+    if(MapEngine.icons[opts.icon_url]) 
+      return MapEngine.icons[opts.icon_url];
+    
+    var icon = new GIcon();
+    icon.image = opts.icon_url;
+    icon.iconSize = new GSize(opts.icon_width,opts.icon_height);
+    icon.iconAnchor = new GPoint(MapEngine.options.icon.icon_anchor_x,MapEngine.options.icon.icon_anchor_y);
+    icon.infoWindowAnchor = new GPoint(MapEngine.options.icon.info_anchor_x,MapEngine.options.icon.info_anchor_y);
+    if(MapEngine.options.icon.shadow_url) {
+      icon.shadow = MapEngine.options.icon.shadow_url;
+      icon.shadowSize = new GSize(MapEngine.options.icon.shadow_width,MapEngine.options.icon.shadow_height);
+     }
+    MapEngine.icons[opts.icon_url] = icon;
+    return icon;
+  },
+  
+  icon: null,
   icons: {},
   
   lastLocation: function() {
@@ -52,9 +82,12 @@ var MapEngine = {
     MapEngine.markers = {}
     for(var i=0;i<MapEngine.data.length-1;i++) {
       var idx = i;
-      var item = MapEngine.data[i]
+      var item = MapEngine.data[i];
       if(item[0]) {
-        marker = new GMarker(new GLatLng(item[0],item[1]), { title: item[2] });
+        var marker_icon = MapEngine.icon;
+        if(item[4].icon_url) marker_icon  = MapEngine.createIcon(item[4]);
+        marker = new GMarker(new GLatLng(item[0],item[1]), { title: item[2], icon: marker_icon });
+        
         marker.idx = [ i ];
         GEvent.addListener(marker,'click',MapEngine.clickMarker);
         MapEngine.map.addOverlay(marker);
@@ -88,7 +121,7 @@ var MapEngine = {
       params['identifier'] = markerData[3];
     }
     
-    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3],
+    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3] + "?cms_partial_page=1",
                     { parameters: params,
                       onComplete: function(req) {
                         marker.openInfoWindowHtml(req.responseText);                  
@@ -104,6 +137,8 @@ var MapEngine = {
     var content = iw.getContentContainers();
     var markerData = MapEngine.data[marker.idx[0]];
     
+    
+    
     if(!params) {
       params = { identifier: markerData[3] };
     }
@@ -111,7 +146,7 @@ var MapEngine = {
       params['identifier'] = markerData[3];
     }
     
-    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3],
+    new Ajax.Request(MapEngine.options.callbackUrl + "/" + markerData[3] + "?cms_partial_page=1",
                     { parameters: params,
                       onComplete: function(req) {
                         MapEngine.map.updateInfoWindow([new GInfoWindowTab(" ",req.responseText)]);

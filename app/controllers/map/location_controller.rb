@@ -26,6 +26,7 @@ class Map::LocationController < ModuleController
   
     @tbl = location_table_generate params, :order => 'city, name'
     
+    
     render :partial => 'location_table' if display
   
   end
@@ -38,6 +39,8 @@ class Map::LocationController < ModuleController
   def edit
     @location = MapLocation.find_by_id(params[:path][0]) || MapLocation.new(:active => true)
     cms_page_path ['Content','Map Locations'], @location.id ? [ 'Edit %s',nil,@location.name ] : 'Create Location'
+    
+    require_js('cms_form_editor')
     
     if request.post? && @location.update_attributes(params[:location])
       redirect_to :action => 'index' 

@@ -3,12 +3,18 @@ class Map::PageController < ParagraphController
   editor_header 'Map Paragraphs'
 
   editor_for :map_view, :name => 'Map View', 
-                          :features => ['map_view'],
+                          :feature => 'map_view',
                           :inputs => [ [ :data, 'Map Data', :map_data ],
                                        [ :callback, 'Map Callback', :map_callback ] ]                                       
   
+  editor_for :location_detail, :name => "Location Detail",
+                          :feature => 'map_page_location_detail',
+                          :inputs => [ [ :location_id, 'Location ID',:path],
+                                       [ :location_identifier, 'Location Identifier', :path ]] 
+  
   
   user_actions :map_details_view
+  
   def map_view
     @options = MapViewOptions.new(params[:map_view] || paragraph.data || {})
     return if handle_module_paragraph_update(@options)
@@ -23,14 +29,24 @@ class Map::PageController < ParagraphController
   end
   
   class MapViewOptions < HashModel
-    default_options :width => 400, :height => 400, :display_type => 'connection', :show_map_types => 'yes',:show_zoom => 'full', :default_icon => nil, :default_zoom => nil, :content_model_id => nil,:content_model_field_id => nil, :content_model_response_field_id => nil
+    attributes :width => 400, :height => 400, :display_type => 'connection', :show_map_types => 'yes',:show_zoom => 'full', :default_icon => nil, :default_zoom => nil, :content_model_id => nil,:content_model_field_id => nil, :content_model_response_field_id => nil, :detail_page_id => nil, :shadow_icon => nil, :icon_anchor_x => 0, :icon_anchor_y => 0, :info_anchor_x => 0,:info_anchor_y => 0
     
-    integer_options :content_model_id,:content_model_field_id, :content_model_response_field_id
+    integer_options :content_model_id,:content_model_field_id, :content_model_response_field_id, :default_icon, :shadow_icon, :icon_anchor_x, :icon_anchor_y, 
+                    :info_anchor_x, :info_anchor_y
+    
+    page_options :detail_page_id
     
     def validate
-      errors.add(:content_model_field_id,'is missing') if !content_model_id.blank? && content_model_field_id.blank?
-      errors.add(:content_model_response_field_id,'is missing') if !content_model_id.blank? && content_model_response_field_id.blank?
+      if self.display_type == 'content_model'
+        errors.add(:content_model_field_id,'is missing') if !content_model_id.blank? && content_model_field_id.blank?
+        errors.add(:content_model_response_field_id,'is missing') if !content_model_id.blank? && content_model_response_field_id.blank?
+      end
     end
+  end
+  
+  
+  class LocationDetailOptions < HashModel
+    
   end
   
   def map_details_view

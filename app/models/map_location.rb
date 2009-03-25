@@ -5,8 +5,11 @@ require 'rexml/document'
 class MapLocation < DomainModel
   validates_presence_of :name,:address,:city,:state
   
-  belongs_to :image, :class_name => 'DomainFile'
+  belongs_to :image, :class_name => 'DomainFile', :foreign_key => 'image_id'
+  belongs_to :icon_image, :class_name => 'DomainFile', :foreign_key => 'icon_image_id'
   
+  attr_accessor :distance
+
   def images
     return @images if @images
     
@@ -74,5 +77,65 @@ class MapLocation < DomainModel
   def self.existing_location(opts)
     self.find(:first,:conditions => opts.slice(:address,:city,:state,:zip))
   end
+  
+  def self.location_data(locations)
+     bounds = { :lat_min => 1000, :lat_max => -1000, :lon_min => 1000, :lon_max => -1000 }
+    data= {  }
+    data[:markers] = locations
+    data[:markers].each do |loc|
+        bounds[:lat_min] = loc.lat if loc.lat < bounds[:lat_min]
+        bounds[:lat_max] = loc.lat if loc.lat > bounds[:lat_max]
+        bounds[:lon_min] = loc.lon if loc.lon < bounds[:lon_min]
+        bounds[:lon_max] = loc.lon if loc.lon > bounds[:lon_max]      
+    end
+    
+    data[:center] = [ (bounds[:lat_max] + bounds[:lat_min]) / 2,
+                      (bounds[:lon_max] + bounds[:lon_min]) / 2 ]
+    data[:bounds] = bounds
+    data
+  end
+  
+  def map_options
+    opts = {}
+    if self.icon_image
+      opts.merge!({:icon_url =>  self.icon_image.url, :icon_width => self.icon_image.width, :icon_height => self.icon_image.height })
+    end
+    opts
+  end
+  
+  def self.deg2rad(deg); deg.to_f * Math::PI / 180; end
+  def self.rad2deg(rad); rad * 180 / Math::PI; end
+  
+  def self.zip_search(zip,max_dist,opts={})
+  
+    zipcode = MapZipcode.find_by_zip(zip)
+    return [] unless zipcode
+    
+    # Order the pubs by distance
+    locs = MapLocation.find(:all,
+        { :select => "map_locations.*,
+                    SQRT(POW(69.1 * (map_locations.lat - #{zipcode.latitude}), 2) + POW(69.1 * (map_locations.lon - #{zipcode.longitude}) * cos(#{zipcode.longitude}/57.3), 2)) as metric",
+        :conditions => 'map_locations.active=1',
+        :order => 'metric'  }.merge(opts))
+        
+    # Now calculate the actual distance in miles
+    locs = locs.map do |loc|
+    
+     theta = zipcode.longitude - loc.lon.to_f
+     dist = Math.sin(deg2rad(zipcode.latitude)) * Math.sin(deg2rad(loc.lat)) + 
+            Math.cos(deg2rad(zipcode.latitude)) * Math.cos(deg2rad(loc.lat)) * Math.cos(deg2rad(theta))
+     dist = Math.acos(dist)
+     dist = rad2deg(dist)
+     distance = dist * 60 * 1.1515 * 0.8684
+     if distance > 10
+       loc.distance = distance.round.to_s
+     else
+       loc.distance = sprintf("%1.1f",distance)
+     end
+     distance > max_dist ? nil : loc
+    end.compact
+  
+    return locs
+  end  
 
 end
