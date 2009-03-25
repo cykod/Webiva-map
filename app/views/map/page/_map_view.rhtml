@@ -37,7 +37,7 @@
       <% end -%>
     <% else -%>
         <% data[:markers].each do |marker| -%>
-          [ <%= marker[:lat] %>,<%= marker[:lon] %>, <%= marker[:title] ? "'#{jh(marker[:title])}'" : "null" %>,<%= marker[:ident]  ? "'#{jh(marker[:ident])}'" : "null" %> ],
+          [ <%= marker[:lat] %>,<%= marker[:lon] %>, <%= marker[:title] ? "'#{jh(marker[:title])}'" : "null" %>,<%= marker[:ident]  ? "'#{jh(marker[:ident])}'" : "null" %>,{} ],
         <% end -%>
     <% end -%>
     []
