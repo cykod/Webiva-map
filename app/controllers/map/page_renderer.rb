@@ -49,7 +49,7 @@ class Map::PageRenderer < ParagraphRenderer
       if request.post? && params[:search] && @search.valid?
         @searching = true
         @locations = MapLocation.zip_search(@search.zip,@search.within)
-        @pages = {}
+        @pages = { :pages => 1 }
       else
         @pages,@locations = MapLocation.paginate(params[:page],:conditions => { :active => true },:order => 'name',:per_page => 20)
       end
