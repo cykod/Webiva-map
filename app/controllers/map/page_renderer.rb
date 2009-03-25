@@ -50,6 +50,8 @@ class Map::PageRenderer < ParagraphRenderer
         @searching = true
         @locations = MapLocation.zip_search(@search.zip,@search.within)
         @pages = { :pages => 1 }
+        
+        data = MapLocation.location_data(@locations)
       else
         @pages,@locations = MapLocation.paginate(params[:page],:conditions => { :active => true },:order => 'name',:per_page => 20)
         
