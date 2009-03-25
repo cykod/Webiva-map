@@ -3,7 +3,7 @@ class Map::PageController < ParagraphController
   editor_header 'Map Paragraphs'
 
   editor_for :map_view, :name => 'Map View', 
-                          :feature => 'map_view',
+                          :feature => 'map_display',
                           :inputs => [ [ :data, 'Map Data', :map_data ],
                                        [ :callback, 'Map Callback', :map_callback ] ]                                       
   
