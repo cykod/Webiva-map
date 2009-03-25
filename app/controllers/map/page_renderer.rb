@@ -77,6 +77,8 @@ class Map::PageRenderer < ParagraphRenderer
   class SearchForm < HashModel
     attributes :within => 100, :zip => ''
     
+    validates_presence_of :zip,:within
+    
     integer_options :within
   end
   

@@ -8,7 +8,7 @@ class Map::PageFeature < ParagraphFeature
       <cms:search_form>
       Search by Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
       </cms:search_form>
-      <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>"</cms:searching>
+      <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
       <cms:locations>
         <table width='100%'>
         <cms:location>
@@ -50,6 +50,7 @@ class Map::PageFeature < ParagraphFeature
           define_location_tags(c)
         c.pagelist_tag('locations:pages') { data[:pages] } 
         c.expansion_tag("searching") { data[:searching] }
+          c.value_tag("searching:results") { |t| data[:locations].length }
           c.value_tag("searching:within") { |t| data[:search].within }
           c.value_tag("searching:zip") {|t| data[:search].zip  }
           c.value_tag("searching:distance") { |t| t.locals.location.distance } 
@@ -73,7 +74,7 @@ class Map::PageFeature < ParagraphFeature
   end
   
   def define_location_tags(c)
-      c.attribute_tags("location", %w(name address city state zip phone fax identifier lon lat contact_name)) { |t| t.locals.location } 
+      c.attribute_tags("location", %w(name address address_2 city state zip phone fax identifier lon lat contact_name contact_email)) { |t| t.locals.location } 
       c.link_tag("location:website") { |t| t.locals.location.website }
       c.value_tag("location:description") { |t| h(t.locals.location.description.to_s).gsub("\n","<br/>")  }
       c.value_tag("location:description_html") { |t| t.locals.location.description_html }
