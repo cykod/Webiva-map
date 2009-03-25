@@ -13,6 +13,7 @@
       <%= f.select :content_model_field_id, @fields if @fields %>
       <%= f.select :content_model_response_field_id, @text_fields if @text_fields %>
   <% end -%>
+      <%= f.radio_buttons :show_all_locations, [ ['Yes',true],['No',false]] %>
       <%= f.page_selector :detail_page_id %>
     <% end -%>
     <% t.tabled_tab do -%>
