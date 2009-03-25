@@ -5,38 +5,41 @@ class Map::PageFeature < ParagraphFeature
   feature :map_display, :default_feature => <<-FEATURE
     <div align='center'>
       <cms:map/>
-      <cms:search_form>
-      Search by Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
-      </cms:search_form>
-      <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
-      <cms:locations>
-        <table width='100%'>
-        <cms:location>
-        <tr>  
-          <td>
-            <cms:name/><br/>
-            <cms:address/><br/>
-            <cms:city/> <cms:state/>, <cms:zip/><br/>          
-          <td>
-          <cms:searching>
-            <td align='right'>
-              <cms:distance/> Miles
-            </td>
-          </cms:searching>
-        </tr>
-        </cms:location>
-        </table>
-        <cms:pages/>
-      </cms:locations>
-      <cms:no_locations>
-        <div>No Results</div>
-      </cms:no_locations>
+      <cms:location_view>
+        <cms:search_form>
+        Search by Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
+        </cms:search_form>
+        <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
+        <cms:locations>
+          <table width='100%'>
+          <cms:location>
+          <tr>  
+            <td>
+              <cms:name/><br/>
+              <cms:address/><br/>
+              <cms:city/> <cms:state/>, <cms:zip/><br/>          
+            <td>
+            <cms:searching>
+              <td align='right'>
+                <cms:distance/> Miles
+              </td>
+            </cms:searching>
+          </tr>
+          </cms:location>
+          </table>
+          <cms:pages/>
+        </cms:locations>
+        <cms:no_locations>
+          <div>No Results</div>
+        </cms:no_locations>
+      </cms:location_view>
     </div>
   FEATURE
   
   
   def map_display_feature(data) 
     webiva_feature(:map_display) do |c|
+       c.expansion_tag("location_view") {data[:options].display_type == 'locations'  }
        c.define_value_tag('map') do |tag| 
          if data[:options].display_type != 'locations' ||  data[:locations].length > 0
             "<div id='map_view_#{data[:paragraph].id}' style='width:#{data[:options].width}px; height:#{data[:options].height}px; overflow:hidden;'></div>"
