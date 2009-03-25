@@ -13,7 +13,7 @@
     end
     map_opts[:zoom] = data[:zoom] ? data[:zoom].to_i :  (!options.default_zoom.blank? ? options.default_zoom.to_i : 17)
     map_opts[:click] = true if data[:click]
-    map_opts[:callbackUrl] = detail_url || url_for(data[:callback])
+    map_opts[:callbackUrl] = detail_url.blank? ? url_for(data[:callback]) : detail_url
     if icon =  DomainFile.find_by_id(options.default_icon)
       map_opts[:icon] = { :url => icon.url, :width => icon.width, :height => icon.height, 
                             :icon_anchor_x => options.icon_anchor_x, :icon_anchor_y => options.icon_anchor_y,
