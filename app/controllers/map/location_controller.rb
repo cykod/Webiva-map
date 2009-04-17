@@ -7,11 +7,11 @@ class Map::LocationController < ModuleController
   
   active_table :location_table, MapLocation,
                 [ ActiveTable::IconHeader.new('',:width => 10),
-                  ActiveTable::StringHeader.new("locality_locations.name",:label => 'Name'),
-                  ActiveTable::StringHeader.new("locality_locations.city",:label => 'City'),
-                  ActiveTable::StringHeader.new("locality_locations.identifier",:label => 'URL'),
-                  ActiveTable::BooleanHeader.new("locality_locations.active",:label => 'Act'),
-                  ActiveTable::BooleanHeader.new("locality_locations.lon IS NOT NULL",:label => 'Loc')
+                  ActiveTable::StringHeader.new("map_locations.name",:label => 'Name'),
+                  ActiveTable::StringHeader.new("map_locations.city",:label => 'City'),
+                  ActiveTable::StringHeader.new("map_locations.identifier",:label => 'URL'),
+                  ActiveTable::BooleanHeader.new("map_locations.active",:label => 'Act'),
+                  ActiveTable::BooleanHeader.new("map_locations.lon IS NOT NULL",:label => 'Loc')
                  ]
                  
   cms_admin_paths 'content',
