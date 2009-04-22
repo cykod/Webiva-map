@@ -87,7 +87,7 @@ class Map::PageRenderer < ParagraphRenderer
     
     def validate
       if self.state.blank? && self.zip.blank?
-        self.errors.on(:zip,'is missing')
+        self.errors.add(:zip,'is missing')
       end
     end
     
