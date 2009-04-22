@@ -25,6 +25,7 @@ class MapLocation < DomainModel
   end
   
   def before_save
+   self.state = self.state.to_s.upcase
    if identifier.blank?
       identifier_try_partial = name.downcase.gsub(/[ _]+/,"-").gsub(/[^a-z+0-9\-]/,"")
       idx = 2
@@ -83,10 +84,10 @@ class MapLocation < DomainModel
     data= {  }
     data[:markers] = locations
     data[:markers].each do |loc|
-        bounds[:lat_min] = loc.lat if loc.lat < bounds[:lat_min]
-        bounds[:lat_max] = loc.lat if loc.lat > bounds[:lat_max]
-        bounds[:lon_min] = loc.lon if loc.lon < bounds[:lon_min]
-        bounds[:lon_max] = loc.lon if loc.lon > bounds[:lon_max]      
+        bounds[:lat_min] = loc.lat if loc.lat &&  loc.lat  < bounds[:lat_min]
+        bounds[:lat_max] = loc.lat if loc.lat && loc.lat > bounds[:lat_max]
+        bounds[:lon_min] = loc.lon if loc.lon && loc.lon < bounds[:lon_min]
+        bounds[:lon_max] = loc.lon if loc.lon && loc.lon > bounds[:lon_max]      
     end
     
     data[:center] = [ (bounds[:lat_max] + bounds[:lat_min]) / 2,
@@ -105,6 +106,12 @@ class MapLocation < DomainModel
   
   def self.deg2rad(deg); deg.to_f * Math::PI / 180; end
   def self.rad2deg(rad); rad * 180 / Math::PI; end
+  
+  def self.state_search(state,opts={})
+   locs = MapLocation.find(:all,
+        { :conditions => ['map_locations.state=?',state ],
+          :order => 'name'  }.merge(opts))
+  end
   
   def self.zip_search(zip,max_dist,opts={})
   

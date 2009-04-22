@@ -7,8 +7,9 @@ class Map::PageFeature < ParagraphFeature
       <cms:map/>
       <cms:location_view>
         <cms:search_form>
-        Search by Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
+        Search by State: <cms:state/> or Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
         </cms:search_form>
+        <cms:state_search>Showing all results in "<cms:value/>" - <cms:results/> Results</cms:state_search>
         <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
         <cms:locations>
           <table width='100%'>
@@ -47,11 +48,14 @@ class Map::PageFeature < ParagraphFeature
        end
        c.form_for_tag('search_form','search') { |t| data[:search] }
           c.field_tag('search_form:zip',:size => 10) 
+          c.field_tag('search_form:state',:control => 'select', :options => ([['-State-',nil]] + ContentModel.state_select_options)) 
           c.field_tag('search_form:within',:control => 'select', :options => data[:distance_options])
           c.button_tag('search_form:button')
        c.loop_tag('location') { |t| data[:locations] }
           define_location_tags(c)
         c.pagelist_tag('locations:pages') { data[:pages] } 
+        c.value_tag("state_search") { data[:state_search] }
+          c.value_tag("state_search:results") { |t| data[:locations].length }
         c.expansion_tag("searching") { data[:searching] }
           c.value_tag("searching:results") { |t| data[:locations].length }
           c.value_tag("searching:within") { |t| data[:search].within }

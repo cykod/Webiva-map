@@ -47,8 +47,13 @@ class Map::PageRenderer < ParagraphRenderer
     else
       @search = SearchForm.new(params[:search])
       if request.post? && params[:search] && @search.valid?
-        @searching = true
-        @locations = MapLocation.zip_search(@search.zip,@search.within)
+        if !@search.state.blank?
+          @locations = MapLocation.state_search(@search.state)
+          @state_search = @search.state
+        else
+          @searching = true
+          @locations = MapLocation.zip_search(@search.zip,@search.within)
+        end
         @pages = { :pages => 1 }
         
         data = MapLocation.location_data(@locations)
@@ -65,7 +70,7 @@ class Map::PageRenderer < ParagraphRenderer
     header_html("<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")
     
     dist_options = [ ['Within 500 Miles',500], ['Within 100 Miles',100],['Within 50 Miles',50], ['Within 10 Miles',10] ] 
-    feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :locations => @locations, :searching => @searching, :pages => @pages }
+    feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :state_search => @state_search, :locations => @locations, :searching => @searching, :pages => @pages }
 
     feature_output = map_display_feature(feature_data)
     render_paragraph :partial => '/map/page/map_view', :locals => {
@@ -78,9 +83,13 @@ class Map::PageRenderer < ParagraphRenderer
   end
   
   class SearchForm < HashModel
-    attributes :within => 100, :zip => ''
+    attributes :within => 100, :zip => '', :state => nil
     
-    validates_presence_of :zip,:within
+    def validate
+      if self.state.blank? && self.zip.blank?
+        self.errors.on(:zip,'is missing')
+      end
+    end
     
     integer_options :within
   end

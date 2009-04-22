@@ -1,5 +1,7 @@
 class Map::AdminController < ModuleController
   
+  permit :map_config
+  
   component_info 'Map', :description => 'Map features', 
                               :access => :private
   cms_admin_paths "options",
@@ -12,6 +14,11 @@ class Map::AdminController < ModuleController
   
   register_handler :model, :end_user_address, "Map::AddressExtension", :actions => [ :before_save  ] 
   
+  register_permissions :map, [ [ :config, 'Map Configuration', 'Can configure map module'],
+                                [ :locations, 'View Map Locations']
+                             ]
+  
+
 
   protected
   def self.get_locations_info
