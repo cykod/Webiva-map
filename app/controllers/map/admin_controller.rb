@@ -14,6 +14,7 @@ class Map::AdminController < ModuleController
   
   register_handler :model, :end_user_address, "Map::AddressExtension", :actions => [ :before_save  ] 
   
+  register_permission_category :map, "Map" ,"Map and Location Permissions"
   register_permissions :map, [ [ :config, 'Map Configuration', 'Can configure map module'],
                                 [ :locations, 'View Map Locations']
                              ]
