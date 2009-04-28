@@ -45,7 +45,7 @@ class Map::PageRenderer < ParagraphRenderer
     elsif options.display_type == 'content_model'
       data = get_content_model_data(paragraph.id,options.content_model_id,options.content_model_field_id,options.content_model_response_field_id)
     else
-      @search = SearchForm.new(params[:search])
+      @search = SearchForm.new(params[:clear] ? {} : params[:search])
       if request.post? && params[:search] && @search.valid?
         if !@search.state.blank?
           @locations = MapLocation.state_search(@search.state)
@@ -69,7 +69,7 @@ class Map::PageRenderer < ParagraphRenderer
     require_js('prototype')
     header_html("<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")
     
-    dist_options = [ ['Within 500 Miles',500], ['Within 100 Miles',100],['Within 50 Miles',50], ['Within 10 Miles',10] ] 
+    dist_options = [ ['Within 50 Miles',50], ['Within 25 Miles',25], ['Within 10 Miles',10], ['Within 10 Miles',5] ] 
     feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :state_search => @state_search, :locations => @locations, :searching => @searching, :pages => @pages }
 
     feature_output = map_display_feature(feature_data)

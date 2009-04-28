@@ -7,7 +7,10 @@ class Map::PageFeature < ParagraphFeature
       <cms:map/>
       <cms:location_view>
         <cms:search_form>
-        Search by State: <cms:state/> or Zipcode: <cms:zip/><cms:within/> <cms:button>Go</cms:button>
+        <cms:not_searching>Search by State: <cms:state/></cms:not_searching> 
+        <cms:no_active_search>or</cms:no_active_search>
+        <cms:no_state_search>Zipcode: <cms:zip/><cms:within/></cms:no_state_search> <cms:button>Search</cms:button>
+        <cms:active_search><cms:clear_search/></cms:active_search>
         </cms:search_form>
         <cms:state_search>Showing all results in "<cms:value/>" - <cms:results/> Results</cms:state_search>
         <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
@@ -50,6 +53,8 @@ class Map::PageFeature < ParagraphFeature
           c.field_tag('search_form:zip',:size => 10) 
           c.field_tag('search_form:state',:control => 'select', :options => ([['-State-',nil]] + ContentModel.state_select_options)) 
           c.field_tag('search_form:within',:control => 'select', :options => data[:distance_options])
+          c.expansion_tag('active_search') { |t| data[:searching] || data[:state_search] }
+          c.button_tag('search_form:clear_search',:name => 'clear',:value => 'Clear Search')
           c.button_tag('search_form:button')
        c.loop_tag('location') { |t| data[:locations] }
           define_location_tags(c)
