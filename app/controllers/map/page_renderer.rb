@@ -69,7 +69,7 @@ class Map::PageRenderer < ParagraphRenderer
     require_js('prototype')
     header_html("<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")
     
-    dist_options = [ ['Within 50 Miles',50], ['Within 25 Miles',25], ['Within 10 Miles',10], ['Within 10 Miles',5] ] 
+    dist_options = [ ['Within 50 Miles',50], ['Within 25 Miles',25], ['Within 10 Miles',10], ['Within 5 Miles',5] ] 
     feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :state_search => @state_search, :locations => @locations, :searching => @searching, :pages => @pages }
 
     feature_output = map_display_feature(feature_data)
