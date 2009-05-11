@@ -1,6 +1,6 @@
 class Map::AdminController < ModuleController
   
-  permit :map_config
+  permit 'map_config'
   
   component_info 'Map', :description => 'Map features', 
                               :access => :private
