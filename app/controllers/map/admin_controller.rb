@@ -23,8 +23,9 @@ class Map::AdminController < ModuleController
 
   protected
   def self.get_locations_info
+  
       [
-      {:name => "Locations",:url => { :controller => '/map/location' } ,:permission => 'map_locations', :icon => 'icons/content/map.gif' }
+      {:name => Map::Utility.options.locations_name,:url => { :controller => '/map/location' } ,:permission => 'map_locations', :icon => 'icons/content/map.gif' }
       ]
   end
 
