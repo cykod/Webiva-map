@@ -32,13 +32,13 @@ class Map::LocationController < ModuleController
   end
 
   def index
-    cms_page_path ['Content'],'Locality Locations'
+    cms_page_path ['Content'],Map::Utility.options.locations_name
     display_location_table(false)
   end
   
   def edit
     @location = MapLocation.find_by_id(params[:path][0]) || MapLocation.new(:active => true)
-    cms_page_path ['Content','Map Locations'], @location.id ? [ 'Edit %s',nil,@location.name ] : 'Create Location'
+    cms_page_path ['Content',[Map::Utility.options.locations_name,nil,url_for({ :action => 'index' })]], @location.id ? [ 'Edit %s',nil,@location.name ] : 'Create Location'
     
     require_js('cms_form_editor')
     
