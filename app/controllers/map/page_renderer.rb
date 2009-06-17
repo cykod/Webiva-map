@@ -90,7 +90,7 @@ class Map::PageRenderer < ParagraphRenderer
     attributes :within => 100, :zip => '', :state => nil, :search_by => 'zip', :details => ''
     
     def validate
-      if self.state.blank? && self.zip.blank?
+      if self.state.blank? && self.zip.blank? && self.details.blank?
         self.errors.add(:zip,'is missing')
       end
     end
