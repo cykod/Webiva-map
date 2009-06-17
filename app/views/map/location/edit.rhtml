@@ -2,7 +2,7 @@
 
 <div class='admin_content'>
 
-<% cms_form_for :location, @location, :html => { :class => 'admin_form', :onsubmit => 'LocationEditor.submitForm();' } do |f| -%>
+<% cms_form_for :location, @location, :html => { :class => 'admin_form' } do |f| -%>
   <%= f.text_field :name,:size => 80 %>
   <%= f.text_field :identifier, :description => 'Leave identifier blank to create automatically',:size => 80 %>
   <%= f.radio_buttons :active, [['Yes',true],['No',false]], :default => true %>

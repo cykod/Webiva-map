@@ -7,13 +7,21 @@ class Map::PageFeature < ParagraphFeature
       <cms:map/>
       <cms:location_view>
         <cms:search_form>
-        <cms:not_searching>Search by State: <cms:state/></cms:not_searching> 
-        <cms:no_active_search>or</cms:no_active_search>
-        <cms:no_state_search>Zipcode: <cms:zip/><cms:within/></cms:no_state_search> <cms:button>Search</cms:button>
+        Search by <cms:search_by />
+        <cms:search_by_zip>
+          Zipcode: <cms:zip/>
+          <cms:within/>
+        </cms:search_by_zip>
+        <cms:search_by_state>
+          Select state: <cms:state/>
+        </cms:search_by_state>
+        <cms:search_by_details>
+          <cms:details/>
+        </cms:search_by_details>
+        <cms:button>Search</cms:button>
         <cms:active_search><cms:clear_search/></cms:active_search>
         </cms:search_form>
-        <cms:state_search>Showing all results in "<cms:value/>" - <cms:results/> Results</cms:state_search>
-        <cms:searching>Searching within <cms:within/> Miles of "<cms:zip/>" - <cms:results/> Results</cms:searching>
+        <cms:search_description>Searching locations <cms:value/></cms:search_description>
         <cms:locations>
           <table width='100%'>
           <cms:location>
@@ -23,11 +31,11 @@ class Map::PageFeature < ParagraphFeature
               <cms:address/><br/>
               <cms:city/> <cms:state/>, <cms:zip/><br/>          
             <td>
-            <cms:searching>
+            <cms:distance>
               <td align='right'>
-                <cms:distance/> Miles
+                <cms:value/> Miles
               </td>
-            </cms:searching>
+            </cms:distance>
           </tr>
           </cms:location>
           </table>
@@ -50,9 +58,45 @@ class Map::PageFeature < ParagraphFeature
          end
        end
        c.form_for_tag('search_form','search') { |t| data[:search] }
-          c.field_tag('search_form:zip',:size => 10) 
-          c.field_tag('search_form:state',:control => 'select', :options => ([['-State-',nil]] + ContentModel.state_select_options)) 
-          c.field_tag('search_form:within',:control => 'select', :options => data[:distance_options])
+          c.field_tag('search_form:search_by',:control => 'select', :options => [['Zipcode','zip'],['State','state'],['Details','details']],
+                        :onchange => %w(zip state details).map { |elm| "document.getElementById('search_by_#{elm}_#{paragraph.id}').style.display = this.value == '#{elm}' ? '' : 'none';" }.join(" ") )
+          
+          c.define_tag('search_form:search_by_zip') do |t|
+            hidden = data[:search].search_by == 'zip' ? '' : 'style="display:none;"'
+            "<span id='search_by_zip_#{paragraph.id}' #{hidden}>" + t.expand.to_s + "</span>"
+          end
+              c.field_tag('search_form:zip',:size => 10) 
+              c.field_tag('search_form:within',:control => 'select', :options => data[:distance_options])
+          
+          c.define_tag('search_form:search_by_state') do |t|
+            hidden = data[:search].search_by == 'state' ? '' : 'style="display:none;"'
+            "<span id='search_by_state_#{paragraph.id}' #{hidden}>" + t.expand.to_s + "</span>"
+          end
+              c.field_tag('search_form:state',:control => 'select', :options => ([['-State-',nil]] + ContentModel.state_select_options)) 
+          
+          
+          c.define_tag('search_form:search_by_details') do |t|
+            hidden = data[:search].search_by == 'details' ? '' : 'style="display:none;"'
+            "<span id='search_by_details_#{paragraph.id}' #{hidden}>" + t.expand.to_s + "</span>"
+          end
+              c.field_tag('search_form:details',:size => 20) 
+          
+          
+          c.value_tag('search_description') do |t|
+            if data[:searching]
+              case data[:search].search_by 
+              when 'zip'
+                "within #{data[:search].within} miles of '#{h data[:search].zip}'"
+              when 'details'
+                "containing the term '#{h data[:search].details}'"
+              when 'state'
+                "in the state of #{h data[:search].state}"
+              end
+            else
+              nil
+            end
+          end
+          
           c.expansion_tag('active_search') { |t| data[:searching] || data[:state_search] }
           c.button_tag('search_form:clear_search',:name => 'clear',:value => 'Clear Search')
           c.button_tag('search_form:button')
@@ -63,9 +107,7 @@ class Map::PageFeature < ParagraphFeature
           c.value_tag("state_search:results") { |t| data[:locations].length }
         c.expansion_tag("searching") { data[:searching] }
           c.value_tag("searching:results") { |t| data[:locations].length }
-          c.value_tag("searching:within") { |t| data[:search].within }
-          c.value_tag("searching:zip") {|t| data[:search].zip  }
-          c.value_tag("searching:distance") { |t| t.locals.location.distance } 
+          c.value_tag("location:distance") { |t| t.locals.location.distance } 
      end
   end
   

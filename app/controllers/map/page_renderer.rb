@@ -47,12 +47,16 @@ class Map::PageRenderer < ParagraphRenderer
     else
       @search = SearchForm.new(params[:clear] ? {} : params[:search])
       if request.post? && params[:search] && @search.valid?
-        if !@search.state.blank?
+        if @search.search_by == 'state' 
           @locations = MapLocation.state_search(@search.state)
           @state_search = @search.state
-        else
+          @searching = true
+        elsif @search.search_by == 'zip'
           @searching = true
           @locations = MapLocation.zip_search(@search.zip,@search.within)
+        elsif @search.search_by == 'details'
+          @locations = MapLocation.details_search(@search.details)
+          @searching = true
         end
         @pages = { :pages => 1 }
         
@@ -83,7 +87,7 @@ class Map::PageRenderer < ParagraphRenderer
   end
   
   class SearchForm < HashModel
-    attributes :within => 100, :zip => '', :state => nil
+    attributes :within => 100, :zip => '', :state => nil, :search_by => 'zip', :details => ''
     
     def validate
       if self.state.blank? && self.zip.blank?

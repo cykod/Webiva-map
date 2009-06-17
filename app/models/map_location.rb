@@ -42,6 +42,8 @@ class MapLocation < DomainModel
     if self.lon.blank? || self.lat.blank? || self.zip.blank?
       calculate_location
     end
+    
+    true
   end
   
   def full_address
@@ -144,5 +146,18 @@ class MapLocation < DomainModel
   
     return locs
   end  
+  
+  
+  def self.details_search(details)
+    
+    vals = []
+    sql =  self.columns.map do |col|
+      vals << "%#{details}%"
+      "(`#{col.name}` LIKE ?)"
+    end
+  
+    locs = MapLocation.find(:all,:conditions => [ "(" + sql.join(" OR ") + ")" ] + vals)
+  
+  end
 
 end

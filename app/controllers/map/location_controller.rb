@@ -9,7 +9,9 @@ class Map::LocationController < ModuleController
                 [ ActiveTable::IconHeader.new('',:width => 10),
                   ActiveTable::StringHeader.new("map_locations.name",:label => 'Name'),
                   ActiveTable::StringHeader.new("map_locations.city",:label => 'City'),
-                  ActiveTable::StringHeader.new("map_locations.identifier",:label => 'URL'),
+                  ActiveTable::StringHeader.new("map_locations.state",:label => 'State'),
+                  ActiveTable::StringHeader.new("map_locations.zip",:label => 'Zip'),
+                  ActiveTable::StringHeader.new("map_locations.contact_name",:label => 'Contact'),
                   ActiveTable::BooleanHeader.new("map_locations.active",:label => 'Act'),
                   ActiveTable::BooleanHeader.new("map_locations.lon IS NOT NULL",:label => 'Loc')
                  ]
