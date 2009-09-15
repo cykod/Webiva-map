@@ -32,7 +32,7 @@ class Map::PageController < ParagraphController
     attributes :width => 400, :height => 400, :display_type => 'connection', :show_map_types => 'yes',:show_zoom => 'full', :default_icon => nil, :default_zoom => nil, :content_model_id => nil,:content_model_field_id => nil, :content_model_response_field_id => nil, :detail_page_id => nil, :shadow_icon => nil, :icon_anchor_x => 0, :icon_anchor_y => 0, :info_anchor_x => 0,:info_anchor_y => 0,:show_all_locations => false, :per_page => 20
     
     integer_options :content_model_id,:content_model_field_id, :content_model_response_field_id, :default_icon, :shadow_icon, :icon_anchor_x, :icon_anchor_y, 
-                    :info_anchor_x, :info_anchor_y
+                    :info_anchor_x, :info_anchor_y, :per_page
     boolean_options :show_all_locations
     
     page_options :detail_page_id
