@@ -62,7 +62,7 @@ class Map::PageRenderer < ParagraphRenderer
         
         data = MapLocation.location_data(@locations)
       else
-        @pages,@locations = MapLocation.paginate(params[:page],:conditions => { :active => true },:order => 'name',:per_page => 20)
+        @pages,@locations = MapLocation.paginate(params[:page],:conditions => { :active => true },:order => 'name',:per_page => options.per_page)
         
         data = MapLocation.location_data(options.show_all_locations ? MapLocation.find(:all,:conditions => { :active => true }) : @locations)
       end

@@ -4,6 +4,7 @@
     <% t.tabled_tab do  -%>
       <%= f.text_field :width %>
       <%= f.text_field :height  %>
+      <%= f.text_field :per_page %>
       <%= f.radio_buttons :display_type, [['Use Page Connection','connection'],['Show Locations','locations'],['Use Content Model Zip Codes','content_model']], :separator => '<br/>', :label => 'Display' %>
       <%= f.radio_buttons :show_map_types, [ ['Yes','yes'],['No','no']] %>
       <%= f.radio_buttons :show_zoom, [ ['Full Controls','full'],['Small Controllers','small'],['No Controllers','off']], :separator => '<br/>' %>
