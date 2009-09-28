@@ -27,7 +27,7 @@ class Map::PageFeature < ParagraphFeature
           <cms:location>
           <tr>  
             <td>
-              <cms:name/><br/>
+              <cms:marker_link><cms:name/></cms:marker_link><br/>
               <cms:address/><br/>
               <cms:city/> <cms:state/>, <cms:zip/><br/>          
             <td>
@@ -54,7 +54,7 @@ class Map::PageFeature < ParagraphFeature
        c.expansion_tag("location_view") {data[:options].display_type == 'locations'  }
        c.define_value_tag('map') do |tag| 
          if data[:options].display_type != 'locations' ||  data[:locations].length > 0
-            "<div id='map_view_#{data[:paragraph].id}' style='width:#{data[:options].width}px; height:#{data[:options].height}px; overflow:hidden;'></div>"
+            "<a name='map_display'></a><div id='map_view_#{data[:paragraph].id}' style='width:#{data[:options].width}px; height:#{data[:options].height}px; overflow:hidden;'></div>"
          end
        end
        c.form_for_tag('search_form','search') { |t| data[:search] }
@@ -101,7 +101,8 @@ class Map::PageFeature < ParagraphFeature
           c.button_tag('search_form:clear_search',:name => 'clear',:value => 'Clear Search')
           c.button_tag('search_form:button')
        c.loop_tag('location') { |t| data[:locations] }
-          define_location_tags(c)
+        define_location_tags(c)
+        c.link_tag('location:marker') { |t|  { :href => '#map_display', :onclick => "MapEngine.activateMarker(#{t.locals.location.id});" } }
         c.pagelist_tag('locations:pages') { data[:pages] } 
         c.value_tag("state_search") { data[:state_search] }
           c.value_tag("state_search:results") { |t| data[:locations].length }
@@ -132,7 +133,8 @@ class Map::PageFeature < ParagraphFeature
       c.link_tag("location:website") { |t| t.locals.location.website }
       c.value_tag("location:description") { |t| h(t.locals.location.description.to_s).gsub("\n","<br/>")  }
       c.value_tag("location:description_html") { |t| t.locals.location.description_html }
-      c.value_tag("location:overview_html") { |t| t.locals.location.description_html }
+    c.value_tag("location:overview_html") { |t| t.locals.location.description_html }
+    c.value_tag("location:id") { |t| t.locals.location.id }
   end
   
 end

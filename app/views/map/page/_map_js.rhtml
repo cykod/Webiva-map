@@ -105,6 +105,16 @@ var MapEngine = {
     MapEngine.map.setCenter(gbounds.getCenter(),MapEngine.map.getBoundsZoomLevel(gbounds));
   
   },  
+
+  activateMarker: function(element_id) {
+    var entry = MapEngine.data.find(function(elm) { return elm[3] == element_id; });
+
+    if(entry) {
+      MapEngine.selectedMarker = entry[4];
+      MapEngine.selectMarker(entry[4]);
+    }
+
+  },
   
   clickMarker: function() {
     MapEngine.selectedMarker = this;
