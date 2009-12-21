@@ -4,6 +4,7 @@ class Map::PageRenderer < ParagraphRenderer
   
   paragraph :map_view
   paragraph :location_detail
+  paragraph :zip_search
   
   features 'map/page_feature'
   
@@ -110,6 +111,28 @@ class Map::PageRenderer < ParagraphRenderer
   
     data = { :location => @loc}
     render_paragraph :text => map_page_location_detail_feature(data)
+  end
+
+  def zip_search
+    @search = SearchForm.new(params[:clear] ? {} : params[:search])
+
+    if request.post? && params[:search]
+      
+      @zip = MapZipcode.find_by_zip(@search.zip)
+      if @zip
+        set_page_connection(:state,@zip.state)
+        set_page_connection(:state_integer,@zip.state)
+      else
+        @no_results = true
+      end
+
+      
+      @searching = true
+
+    end
+
+    render_paragraph :text => map_page_zip_search_feature
+    
   end
   
   protected

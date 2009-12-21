@@ -136,5 +136,35 @@ class Map::PageFeature < ParagraphFeature
     c.value_tag("location:overview_html") { |t| t.locals.location.description_html }
     c.value_tag("location:id") { |t| t.locals.location.id }
   end
+
+  feature :map_page_zip_search, :default_feature => <<-FEATURE
+<cms:search_form>
+Search by zipcode: <cms:zip/><cms:submit/>
+<cms:searching>
+  <cms:zip>
+    Showing results for <cms:city/>
+   </cms:zip>
+   <cms:no_results>
+      Could not find a zipcode by that name
+   </cms:no_results>
+</cms:searching>
+</cms:search_form>
+
+FEATURE
+
+  def map_page_zip_search_feature(data)
+    webiva_feature(:map_page_zip_search) do |c|
+      c.form_for_tag('search_form','search') { |t| data[:search] }
+      c.field_tag('search_form:zip',:size => 10) 
+      c.button_tag('search_form:submit')
+      c.expansion_tag('searching') {  |t| data[:searching] }
+      
+      c.expansion_tag('searching:no_results') { |t| data[:no_results]}
+      c.expansion_tag('searching:zip') { |t| t.locals.zip = data[:zip]}
+
+      c.attribute_tags('searching:zip',%W(zip city state latitude longitude timezone dst country))  { |t| t.locals.zip }
+
+    end
+  end
   
 end

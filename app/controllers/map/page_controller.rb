@@ -12,7 +12,9 @@ class Map::PageController < ParagraphController
                           :inputs => [ [ :location_id, 'Location ID',:path],
                                        [ :location_identifier, 'Location Identifier', :path ]] 
   
-  
+  editor_for :zip_search, :name => 'Zip Code Search',
+                         :outputs => [ [ :state, 'State Output', :path ], [ :state_integer, "State Output (Integer)",:integer]]
+
   user_actions :map_details_view
   
   def map_view
@@ -48,6 +50,10 @@ class Map::PageController < ParagraphController
   
   class LocationDetailOptions < HashModel
     
+  end
+
+  class ZipSearchOptions < HashModel
+
   end
   
   def map_details_view
