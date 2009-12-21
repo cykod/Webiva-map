@@ -12,7 +12,7 @@ class Map::PageController < ParagraphController
                           :inputs => [ [ :location_id, 'Location ID',:path],
                                        [ :location_identifier, 'Location Identifier', :path ]] 
   
-  editor_for :zip_search, :name => 'Zip Code Search',
+  editor_for :zip_search, :name => 'Zip Code Search',  :feature => 'map_page_zip_search',
                          :outputs => [ [ :state, 'State Output', :path ], [ :state_integer, "State Output (Integer)",:integer]]
 
   user_actions :map_details_view
