@@ -38,7 +38,8 @@ class Map::AdminController < ModuleController
       
       if request.post? && params[:options] && @options.valid?
         Configuration.set_config_model(@options)
-        flash[:notice] = 'Updated Locality Options'
+        SiteModule.complete_module_initialization('map')
+        flash[:notice] = 'Updated Map Options'
         cms_page_redirect "Modules"
       end
     end
