@@ -3,8 +3,8 @@
 </script>
 
 <% action_panel do |p| %>
- <%= p.link 'Add a new location',:icon => 'add.gif',:action => 'edit' %>
- <%= p.link 'Download Locations',:icon => 'download.gif',:action => 'download' %>
+ <%= p.link 'Add a new ' + Map::Utility.options.locations_name.singularize.to_s,:icon => 'add.gif',:action => 'edit' %>
+ <%= p.link 'Download ' + Map::Utility.options.locations_name,:icon => 'download.gif',:action => 'download' %>
 <% end -%>
 
 <hr/>

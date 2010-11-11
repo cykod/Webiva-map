@@ -40,7 +40,7 @@ class Map::LocationController < ModuleController
   
   def edit
     @location = MapLocation.find_by_id(params[:path][0]) || MapLocation.new(:active => true)
-    cms_page_path ['Content',[Map::Utility.options.locations_name,nil,url_for({ :action => 'index' })]], @location.id ? [ 'Edit %s',nil,@location.name ] : 'Create Location'
+    cms_page_path ['Content',[Map::Utility.options.locations_name,url_for({ :action => 'index' })]], @location.id ? [ 'Edit %s',nil,@location.name ] : 'Create'
     
     require_js('cms_form_editor')
     
