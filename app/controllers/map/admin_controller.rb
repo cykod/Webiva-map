@@ -20,7 +20,7 @@ class Map::AdminController < ModuleController
                              ]
   
 
-  register_handler :model, :social_unit, "Map::SocialCreateLocation", :actions => [ :after_save ] 
+  register_handler :model, :social_unit, "Map::SocialCreateLocation", :actions => [ :after_save, :before_destroy ] 
 
   protected
   def self.get_locations_info

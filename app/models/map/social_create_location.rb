@@ -12,4 +12,10 @@ class Map::SocialCreateLocation < DomainModelExtension
     loc.save
   end
 
+  def before_destroy(social_unit)
+    loc = MapLocation.find_by_locality_location_type_id(social_unit.id)
+
+    loc.destroy if loc
+  end
+
 end
