@@ -54,7 +54,7 @@ class Map::PageRenderer < ParagraphRenderer
           @searching = true
         elsif @search.search_by == 'zip'
           @searching = true
-          @locations = MapLocation.zip_search(@search.zip,@search.within)
+          @locations = MapLocation.zip_search(@search.zip.to_s.gsub(" ",""),@search.within)
         elsif @search.search_by == 'details'
           @locations = MapLocation.details_search(@search.details)
           @searching = true
@@ -72,8 +72,9 @@ class Map::PageRenderer < ParagraphRenderer
   
     
     require_js('prototype')
-    header_html("<script src=\"http://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")
-    
+    header_html("<script src=\"http#{'s' if request.ssl?}://www.google.com/jsapi\"></script>") if options.center_via_google
+
+    header_html("<script src=\"http#{'s' if request.ssl?}://maps.google.com/maps?file=api&v=2&key=#{module_options.api_key}\" type=\"text/javascript\"></script>")     
     dist_options = [ ['Within 50 Miles',50], ['Within 25 Miles',25], ['Within 10 Miles',10], ['Within 5 Miles',5] ] 
     feature_data = { :paragraph => paragraph, :options =>  options, :distance_options => dist_options, :search => @search, :state_search => @state_search, :locations => @locations, :searching => @searching, :pages => @pages }
 
@@ -82,6 +83,7 @@ class Map::PageRenderer < ParagraphRenderer
           :paragraph => paragraph, 
           :options =>  options, 
           :in_editor => editor?, 
+          :searching => @searching,
           :data => data, 
           :feature_output => feature_output,
           :detail_url => options.detail_page_url.to_s }

@@ -24,9 +24,25 @@
           map_opts[:icon].merge!({:shadow_url => shadow.url, :shadow_width => shadow.width, :shadow_height => shadow.height })
         end    
       end
+      map_opts[:autolocate] = options.center_via_google
     end
    -%>
-    MapEngine.initialize(<%= map_opts.to_json %>) 
+
+   var map_opts = <%= map_opts.to_json %>;
+
+   <% if !searching %>
+   if(map_opts.autolocate && typeof google.loader != 'undefined') {
+     var cloc = google.loader.ClientLocation;
+     if (cloc  != null) { 
+       if(cloc.latitude && cloc.longitude) {
+         map_opts.bounds = null;
+         map_opts.lat  = cloc.latitude;
+         map_opts.lon = cloc.longitude;
+       }
+     }
+   }
+ <% end -%>
+   MapEngine.initialize(map_opts) 
                 
 <% if data.is_a?(Hash) && data[:markers] && data[:markers].length > 0 -%> 
   MapEngine.data = [
